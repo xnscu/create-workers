@@ -1,0 +1,19 @@
+diff --git a/node_modules/nanoid/index.browser.js b/node_modules/nanoid/index.browser.js
+index f5bd92d..292a3ba 100644
+--- a/node_modules/nanoid/index.browser.js
++++ b/node_modules/nanoid/index.browser.js
+@@ -1,4 +1,14 @@
+ export { urlAlphabet } from './url-alphabet/index.js'
++if (!crypto) {
++  crypto = {
++    getRandomValues(array) {
++      for (var i = 0, l = array.length; i < l; i++) {
++        array[i] = Math.floor(Math.random() * 256);
++      }
++      return array;
++    }
++  };
++}
+ export let random = bytes => crypto.getRandomValues(new Uint8Array(bytes))
+ export let customRandom = (alphabet, defaultSize, getRandom) => {
+   let mask = (2 << (Math.log(alphabet.length - 1) / Math.LN2)) - 1
