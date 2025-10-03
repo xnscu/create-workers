@@ -5,7 +5,7 @@ Start an opinioned vite project.
 # Usage
 
 ```sh
-npm create vitex@latest -y
+npm create workers@latest -y
 ```
 
 or passing arguments directly:
