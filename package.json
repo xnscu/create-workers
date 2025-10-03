@@ -13,8 +13,8 @@
     "template"
   ],
   "scripts": {
-    "prerc": "npm --no-git-tag-version version minor",
-    "rc": "yarn push",
+    "preb": "npm --no-git-tag-version version minor",
+    "b": "yarn push",
     "commit": "git add . && git commit -am ",
     "c": "yarn commit",
     "g": "yarn push",

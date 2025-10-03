@@ -7,11 +7,11 @@ import VueRouter from "unplugin-vue-router/vite";
 import { VueRouterAutoImports } from "unplugin-vue-router";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
-import AntdvResolver from "antdv-component-resolver";
-import ViteRequireContext from "@originjs/vite-plugin-require-context";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import * as dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
+import { PrimeVueResolver } from "@primevue/auto-import-resolver";
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 const { parsed: exposedEnvs } = dotenvExpand.expand({
   ...dotenv.config({
@@ -21,7 +21,7 @@ const { parsed: exposedEnvs } = dotenvExpand.expand({
   ignoreProcessEnv: true,
 });
 const envKeys = Object.fromEntries(
-  Object.entries(exposedEnvs).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)]),
+  Object.entries(exposedEnvs).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
 );
 // console.log({ envKeys });
 const env = process.env;
@@ -56,7 +56,7 @@ const plugins = [
     extensions: ["vue"],
     dts: "./src/unplugin/components.d.ts",
     directoryAsNamespace: true,
-    resolvers: [AntdvResolver()],
+    resolvers: [PrimeVueResolver()],
   }),
   // https://uvr.esm.is/guide/configuration.html
   // https://uvr.esm.is/introduction.html#from-scratch
@@ -122,20 +122,36 @@ const plugins = [
       return `export default Uint8Array.from(atob('${data}'), (c) => c.charCodeAt(0))`;
     },
   },
-  ViteRequireContext.default(),
+  cloudflare(),
 ];
 // https://vitejs.dev/config/
 export default defineConfig({
+  plugins,
+  base: "./",
+  define: envKeys,
   build: {
     minify: true,
     rollupOptions: {
       plugins: [],
     },
   },
+  // server: {
+  //   proxy: {
+  //     "/plugins": {
+  //       target: "http://localhost:8787",
+  //       changeOrigin: true,
+  //     },
+  //     "/review": {
+  //       target: "http://localhost:8787",
+  //       changeOrigin: true,
+  //     },
+  //     "/users": {
+  //       target: "http://localhost:8787",
+  //       changeOrigin: true,
+  //     },
+  //   },
+  // },
   assetsInclude: ["**/*.xlsx", "**/*.docx"],
-  base: "./",
-  define: envKeys,
-  plugins,
   optimizeDeps: {
     include: ["vue"],
   },
@@ -145,11 +161,11 @@ export default defineConfig({
       "@/": fileURLToPath(new URL("./src", import.meta.url)) + "/",
     },
   },
-  css: {
+  css: {```````
     preprocessorOptions: {
-      less: {
+      less: {`
         javascriptEnabled: true,
       },
     },
-  },
+  },`````
 });

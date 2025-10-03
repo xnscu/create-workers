@@ -1,10 +1,8 @@
 import { createApp } from "vue";
 import router from "./router";
 import App from "./App.vue";
-import { Model } from "~/lib/model";
-import { BaseField } from "~/lib/model/field.mjs";
+import { Model, BaseField } from "xodel";
 import { request } from "~/lib/Http";
-import "@/assets/main.css";
 import "ant-design-vue/dist/reset.css";
 
 Model.request = request;
