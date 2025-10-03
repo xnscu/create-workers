@@ -1,1 +1,0 @@
-<template>Vitex Hello: you make it!</template>
