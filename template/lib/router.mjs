@@ -1,13 +1,13 @@
 // ES6 JavaScript version of router.lua
 
 const METHOD_BITMASK = {
-  GET: 1,       // 2^0
-  POST: 2,      // 2^1
-  PATCH: 4,     // 2^2
-  PUT: 8,       // 2^3
-  DELETE: 16,   // 2^4
-  HEAD: 32,     // 2^5
-  OPTIONS: 64,  // 2^6
+  GET: 1, // 2^0
+  POST: 2, // 2^1
+  PATCH: 4, // 2^2
+  PUT: 8, // 2^3
+  DELETE: 16, // 2^4
+  HEAD: 32, // 2^5
+  OPTIONS: 64, // 2^6
   CONNECT: 128, // 2^7
 };
 
@@ -50,7 +50,7 @@ function methods_to_bitmask(methods) {
 }
 
 function is_static_path(path) {
-  const parts = path.split('/').filter(part => part.length > 0);
+  const parts = path.split('/').filter((part) => part.length > 0);
   for (const part of parts) {
     if (DYNAMIC_SIGN[part.charCodeAt(0)]) {
       return false;
@@ -74,7 +74,8 @@ function set_match_methods(tree) {
     const pkey = key.substring(1);
     const bkey = key.charCodeAt(0);
 
-    if (bkey === 35) { // '#'
+    if (bkey === 35) {
+      // '#'
       number_methods.push((node, part, params) => {
         const n = Number(part);
         if (!isNaN(n)) {
@@ -82,7 +83,8 @@ function set_match_methods(tree) {
           return node.children[key];
         }
       });
-    } else if (bkey === 60) { // '<'
+    } else if (bkey === 60) {
+      // '<'
       const pair_index = key.indexOf('>', 1);
       const regex = key.substring(pair_index + 1);
       const regex_key = key.substring(1, pair_index);
@@ -97,12 +99,14 @@ function set_match_methods(tree) {
           // Invalid regex, skip
         }
       });
-    } else if (bkey === 58) { // ':'
+    } else if (bkey === 58) {
+      // ':'
       char_methods.push((node, part, params) => {
         params[pkey] = part;
         return node.children[key];
       });
-    } else if (bkey === 42) { // '*'
+    } else if (bkey === 42) {
+      // '*'
       tree.match_rest = true;
       fallback_methods.push((node, part, params) => {
         params[pkey] = part;
@@ -136,7 +140,6 @@ function set_match_methods(tree) {
 }
 
 class Router {
-
   static NotFoundError = NotFoundError;
   static MethodNotAllowedError = MethodNotAllowedError;
 
@@ -171,14 +174,14 @@ class Router {
     const response = {
       error,
       message,
-      ...extra
+      ...extra,
     };
 
     return new Response(JSON.stringify(response), {
       status: statusCode,
       headers: {
-        'Content-Type': 'application/json; charset=utf-8'
-      }
+        'Content-Type': 'application/json; charset=utf-8',
+      },
     });
   }
 
@@ -188,21 +191,24 @@ class Router {
 
   static methodNotAllowedResponse(request, allowedMethods = []) {
     const headers = {
-      'Content-Type': 'application/json; charset=utf-8'
+      'Content-Type': 'application/json; charset=utf-8',
     };
 
     if (allowedMethods.length > 0) {
       headers['Allow'] = allowedMethods.join(', ');
     }
 
-    return new Response(JSON.stringify({
-      error: 'Method Not Allowed',
-      message: `Method ${request.method} is not allowed for this endpoint`,
-      allowed_methods: allowedMethods
-    }), {
-      status: 405,
-      headers
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Method Not Allowed',
+        message: `Method ${request.method} is not allowed for this endpoint`,
+        allowed_methods: allowedMethods,
+      }),
+      {
+        status: 405,
+        headers,
+      },
+    );
   }
 
   static internalServerErrorResponse(message = 'An unexpected error occurred') {
@@ -233,7 +239,7 @@ class Router {
 
   is_route(view) {
     if (!Array.isArray(view)) {
-      throw new RouterError("route must be an array");
+      throw new RouterError('route must be an array');
     }
 
     if (Array.isArray(view[0])) {
@@ -246,7 +252,9 @@ class Router {
         }
       }
     } else if (typeof view[0] !== 'string') {
-      throw new RouterError(`the first element of route should be a string or array, not ${typeof view[0]}`);
+      throw new RouterError(
+        `the first element of route should be a string or array, not ${typeof view[0]}`,
+      );
     }
 
     if (view[2] !== undefined) {
@@ -257,7 +265,9 @@ class Router {
       } else if (Array.isArray(view[2])) {
         for (const method of view[2]) {
           if (typeof method !== 'string') {
-            throw new RouterError(`the methods array should contain string only, not ${typeof method}`);
+            throw new RouterError(
+              `the methods array should contain string only, not ${typeof method}`,
+            );
           }
           if (!METHOD_BITMASK[method.toUpperCase()]) {
             throw new RouterError(`invalid http method: ${method}`);
@@ -270,7 +280,6 @@ class Router {
 
     return this.is_handler(view[1]);
   }
-
 
   insert(path, handler, methods) {
     if (Array.isArray(path)) {
@@ -293,6 +302,7 @@ class Router {
   }
 
   _insert(path, handler, methods) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let node = this;
 
     if (is_static_path(path)) {
@@ -301,7 +311,7 @@ class Router {
       }
       node = node[path];
     } else {
-      const parts = path.split('/').filter(part => part.length > 0);
+      const parts = path.split('/').filter((part) => part.length > 0);
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
         if (!node.children) {
@@ -315,7 +325,9 @@ class Router {
         // 检查是否是 '*' 通配符
         if (part.startsWith('*')) {
           if (i !== parts.length - 1) {
-            throw new RouterError('Catch-all routes are only supported as the last part of the path');
+            throw new RouterError(
+              'Catch-all routes are only supported as the last part of the path',
+            );
           }
           break;
         }
@@ -342,9 +354,10 @@ class Router {
     // First try static match
     let node = this[path];
     if (!node) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       node = this;
       let cut = 1;
-      const parts = path.split('/').filter(part => part.length > 0);
+      const parts = path.split('/').filter((part) => part.length > 0);
 
       for (const part of parts) {
         if (node.children && node.children[part]) {

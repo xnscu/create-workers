@@ -1,7 +1,7 @@
-import { globalIgnores } from "eslint/config";
-import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
-import pluginVue from "eslint-plugin-vue";
-import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
+import { globalIgnores } from 'eslint/config';
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import pluginVue from 'eslint-plugin-vue';
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
@@ -10,14 +10,14 @@ import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
 
 export default defineConfigWithVueTs(
   {
-    name: "app/files-to-lint",
+    name: 'app/files-to-lint',
     // Include JS, JSX, MJS and CJS so the rules below apply to all JS/TS files and Vue script blocks
-    files: ["**/*.{js,jsx,cjs,mjs,ts,mts,tsx,vue}"],
+    files: ['**/*.{js,jsx,cjs,mjs,ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(["**/dist/**", "**/dist-ssr/**", "**/coverage/**"]),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
-  pluginVue.configs["flat/essential"],
+  pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
   skipFormatting,
   // language/globals/parserOptions migrated from .eslintrc.cjs
@@ -26,42 +26,46 @@ export default defineConfigWithVueTs(
       globals: {
         // keep the same semantics as the original .eslintrc.cjs
         globalThis: false,
-        exec: "readonly",
-        getCurrentPages: "readonly",
-        uniCloud: "readonly",
-        uni: "readonly",
-        wx: "readonly",
-        getApp: "readonly",
-        log: "readonly",
+        exec: 'readonly',
+        getCurrentPages: 'readonly',
+        uniCloud: 'readonly',
+        uni: 'readonly',
+        wx: 'readonly',
+        getApp: 'readonly',
+        log: 'readonly',
       },
-      parserOptions: { ecmaVersion: "latest" },
+      parserOptions: { ecmaVersion: 'latest' },
     },
   },
   // Project-specific rule overrides (migrated from .eslintrc.cjs)
   {
     rules: {
-      "no-empty": "off",
-      "max-len": ["warn", { code: 100, ignoreComments: true, ignoreStrings: true }],
-      "prefer-const": [
-        "error",
+      'no-empty': 'off',
+      'max-len': ['warn', { code: 100, ignoreComments: true, ignoreStrings: true }],
+      'prefer-const': [
+        'error',
         {
-          destructuring: "all",
+          destructuring: 'all',
           ignoreReadBeforeAssign: false,
         },
       ],
-      "vue/no-unused-vars": [
-        "warn",
+      'vue/no-unused-vars': [
+        'warn',
         {
-          ignorePattern: "^_",
+          ignorePattern: '^_',
         },
       ],
+      // Allow <script> blocks without a `lang` attribute in single-file components
+      // (some projects use plain JS in <script> blocks). Disable the rule that
+      // requires a lang attribute so editors/CI won't report it as an error.
+      'vue/block-lang': 'off',
       // Ensure TypeScript-specific unused variable rule is also only a warning
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { vars: "all", args: "after-used", argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { vars: 'all', args: 'after-used', argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      "no-unused-vars": ["warn", { vars: "all", args: "after-used", argsIgnorePattern: "^_" }],
-      "vue/multi-word-component-names": "off",
+      'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', argsIgnorePattern: '^_' }],
+      'vue/multi-word-component-names': 'off',
     },
   },
 );
