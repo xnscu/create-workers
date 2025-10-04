@@ -1,23 +1,26 @@
 import axios from "axios";
 import useStore from "~/composables/useStore";
 
-const viteEnv = import.meta.env;
-const scheme = viteEnv.VITE_HTTPS == "on" ? "https" : "http";
-const scheme_dev = viteEnv.VITE_HTTPS_DEV == "on" ? "https" : "http";
-const baseURL =
-  process.env.NODE_ENV == "production"
-    ? `${scheme}://${window.location.host}`
-    : `${scheme_dev}://${window.location.host}${viteEnv.VITE_PROXY_PREFIX}`;
+const { loading, version } = useStore();
+// Prefer an explicit build-time override (Vite: VITE_API_BASE). Otherwise use a relative
+// '/api' so axios resolves it against the current origin in browsers.
+// This avoids directly depending on window.location and allows SSR or worker builds to
+// supply an absolute URL via env when needed.
+const baseURL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE)
+  ? import.meta.env.VITE_API_BASE
+  : '/api'
 
 const myAxios = axios.create({
   baseURL,
-  timeout: 0, // 小心,如果设置得太短了, Axios会主动cancel请求, 有可能nginx仍在处理此请求后续成功,但前端认为没有成功
+  // caution, if set too short, Axios will actively cancel the request,
+  // nginx may still be processing this request and succeed later,
+  // but the front end thinks it failed
+  timeout: 0,
 });
 
 // Add a request interceptor
 myAxios.interceptors.request.use(
   function (config) {
-    const { loading, version } = useStore();
     loading.value = true;
     config.headers["X-Version"] = version.value;
     return config;
@@ -32,14 +35,12 @@ myAxios.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    const { loading } = useStore();
     loading.value = false;
     return response;
   },
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    const { loading } = useStore();
     loading.value = false;
     throw error;
   },
@@ -62,13 +63,13 @@ async function get(url, config = {}) {
     url,
     method: "GET",
     headers: { "X-Requested-With": "XMLHttpRequest" },
-    responseType: "json", // 'arraybuffer', 'document', 'json', 'text', 'stream','blob'
+    responseType: "json",
     responseEncoding: "utf8",
     ...config,
   });
 }
 
-const Http = {
+export const Http = {
   post,
   get,
 };
@@ -81,7 +82,7 @@ export const useGet = async (url, config = {}) => {
   const { data } = await get(url, config);
   return data;
 };
-export default Http;
+
 
 const axiosWrapper = async (...args) => {
   const resp = await myAxios(...args);
@@ -91,4 +92,4 @@ const axiosWrapper = async (...args) => {
   return resp;
 };
 
-export { myAxios as axios, axiosWrapper as request, Http };
+export { myAxios as axios, axiosWrapper as request };

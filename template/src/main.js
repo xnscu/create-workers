@@ -38,8 +38,8 @@ app.config.errorHandler = (error, instance, info) => {
     } else if (error.message !== "") {
       return Notice.error(error.message);
     } else {
-        return Notice.error(error);
-      }
+      return Notice.error(error);
+    }
   }
   Notice.error(typeof error == "object" ? error.message : error);
 };
