@@ -1,3 +1,3 @@
-export default function(request, env, ctx) {
-  return 'Hello, world!';
+export default function (request, env, ctx) {
+  return 'Hello, world!'
 }

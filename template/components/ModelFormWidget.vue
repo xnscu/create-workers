@@ -1,252 +1,252 @@
 <script setup lang="js">
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons-vue";
-import dayjs from "dayjs";
-import { chunk } from "~/lib/utils";
-import Alioss from "~/lib/Alioss";
-import TinymceEditorVue from "./TinymceEditor.vue";
-import { normalize_choice } from "~/lib/model/field.mjs";
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
+import { chunk } from '~/lib/utils'
+import Alioss from '~/lib/Alioss'
+import TinymceEditorVue from './TinymceEditor.vue'
+import { normalize_choice } from '~/lib/model/field.mjs'
 
-const emit = defineEmits(["update:modelValue", "update:error", "update:values"]);
+const emit = defineEmits(['update:modelValue', 'update:error', 'update:values'])
 const props = defineProps({
   field: { type: Object, required: true },
   name: { type: [String, Array] },
   values: { type: Object },
   modelValue: { required: true },
-  error: { type: [String, Array], default: "" },
-  borderColor: { type: String, default: "#ccc" },
-});
-const searchOptions = ref([]);
-const fieldType = computed(() => props.field.type);
+  error: { type: [String, Array], default: '' },
+  borderColor: { type: String, default: '#ccc' },
+})
+const searchOptions = ref([])
+const fieldType = computed(() => props.field.type)
 const sendValue = (value) => {
-  emit("update:modelValue", value);
+  emit('update:modelValue', value)
   // log("sendValue:", value, props.values);
-};
+}
 const sendError = (value) => {
-  emit("update:error", value);
-};
-const disableEnterKeyDown = (e) => e.keyCode === 13 && e.preventDefault();
+  emit('update:error', value)
+}
+const disableEnterKeyDown = (e) => e.keyCode === 13 && e.preventDefault()
 const blurValidate = () => {
-  sendError(); // 先清除老错误
+  sendError() // 先清除老错误
   try {
-    const validated = props.field.validate(props.modelValue);
-    return sendValue(validated); // 为了blur的时候compact=true能看到效果(去除中间空格)
+    const validated = props.field.validate(props.modelValue)
+    return sendValue(validated) // 为了blur的时候compact=true能看到效果(去除中间空格)
   } catch (error) {
-    return sendError(error.message);
+    return sendError(error.message)
   }
-};
-const placeholder = computed(() => props.field.attrs?.placeholder || props.field.hint);
+}
+const placeholder = computed(() => props.field.attrs?.placeholder || props.field.hint)
 const pickerCurrentChoice = computed(() => {
-  const lastGroup = props.field.group[props.field.group.length - 1];
-  const key = lastGroup.value_key;
-  return props.field.choices.find((c) => c[key] === props.modelValue);
-});
+  const lastGroup = props.field.group[props.field.group.length - 1]
+  const key = lastGroup.value_key
+  return props.field.choices.find((c) => c[key] === props.modelValue)
+})
 const pickerInitValue = computed(() => {
   if (props.modelValue == null) {
-    return [];
+    return []
   } else if (props.field.group) {
-    return props.field.group.map((opts) => pickerCurrentChoice.value?.[opts.label_key]);
+    return props.field.group.map((opts) => pickerCurrentChoice.value?.[opts.label_key])
   } else {
-    return props.modelValue;
+    return props.modelValue
   }
-});
+})
 const onCascaderChange = (e) => {
   if (props.field.group) {
     for (const [i, opts] of props.field.group.entries()) {
-      emit("update:values", { [opts.form_key || opts.value_key]: e.value[i] });
+      emit('update:values', { [opts.form_key || opts.value_key]: e.value[i] })
     }
   } else {
-    sendValue(e.value);
+    sendValue(e.value)
   }
-  sendError();
-};
+  sendError()
+}
 const fieldChoices = computed(() => {
-  if (typeof props.field.choices == "function") {
-    return searchOptions.value;
+  if (typeof props.field.choices == 'function') {
+    return searchOptions.value
   }
   if (!Array.isArray(props.field.choices)) {
-    return null;
+    return null
   }
-  const group = props.field.group;
+  const group = props.field.group
   if (group) {
-    const choices = [];
+    const choices = []
     for (const c of props.field.choices) {
-      let currentLevel = choices;
+      let currentLevel = choices
       for (const [i, opts] of group.entries()) {
-        let l = currentLevel.find((e) => e.value == c[opts.value_key]);
+        let l = currentLevel.find((e) => e.value == c[opts.value_key])
         if (!l) {
-          l = { value: c[opts.value_key], label: c[opts.label_key] };
+          l = { value: c[opts.value_key], label: c[opts.label_key] }
           if (i < group.length - 1) {
-            l.children = [];
+            l.children = []
           }
-          currentLevel.push(l);
+          currentLevel.push(l)
         }
-        currentLevel = l.children;
+        currentLevel = l.children
       }
     }
-    return choices;
-  } else if (fieldType.value === "array" && props.field.field) {
+    return choices
+  } else if (fieldType.value === 'array' && props.field.field) {
     return props.field.field.choices.map((e) => ({
       ...e,
-    }));
+    }))
   } else {
     return props.field.choices.map((e) => ({
       ...e,
-    }));
+    }))
   }
-});
-const fieldColumns = computed(()=>props.field.attrs.columns || 1)
-const chunkFieldChoices = computed(() => chunk(fieldChoices.value, fieldColumns.value));
-const fieldChoicesValues = computed(() => fieldChoices.value.map((e) => e.value));
+})
+const fieldColumns = computed(() => props.field.attrs.columns || 1)
+const chunkFieldChoices = computed(() => chunk(fieldChoices.value, fieldColumns.value))
+const fieldChoicesValues = computed(() => fieldChoices.value.map((e) => e.value))
 // checkbox-group里面使用checkbox的时候,值的顺序是按照点击事件先后排序,故需要特别处理
 const sendSortedArray = (array) => {
   emit(
-    "update:modelValue",
+    'update:modelValue',
     array.sort((a, b) => {
-      return fieldChoicesValues.value.indexOf(a) - fieldChoicesValues.value.indexOf(b);
+      return fieldChoicesValues.value.indexOf(a) - fieldChoicesValues.value.indexOf(b)
     }),
-  );
-};
+  )
+}
 const currentChoiceLabel = computed(() => {
   if (props.field.group) {
-    const c = pickerCurrentChoice.value;
-    return c ? props.field.group.map((opts) => `${c[opts.label_key]}`).join("") : "";
+    const c = pickerCurrentChoice.value
+    return c ? props.field.group.map((opts) => `${c[opts.label_key]}`).join('') : ''
   } else {
     const label =
-      searchOptions.value.find((c) => c.value === props.modelValue)?.label ?? props.modelValue;
-    return label;
+      searchOptions.value.find((c) => c.value === props.modelValue)?.label ?? props.modelValue
+    return label
   }
-});
-const autocompleteValue = ref();
+})
+const autocompleteValue = ref()
 const initLabel = computed(
   () => props.values?.[`${props.field.name}__${props.field.reference_label_column}`],
-);
-const propValue = computed(() => props.modelValue);
+)
+const propValue = computed(() => props.modelValue)
 if (initLabel.value !== null && initLabel.value !== undefined) {
-  autocompleteValue.value = initLabel.value;
+  autocompleteValue.value = initLabel.value
 } else if (props.modelValue !== null && props.modelValue !== undefined) {
   if (fieldChoices.value?.length) {
-    const find = fieldChoices.value.find((c) => c.value === props.modelValue);
+    const find = fieldChoices.value.find((c) => c.value === props.modelValue)
     if (find) {
-      autocompleteValue.value = find.label;
+      autocompleteValue.value = find.label
     } else {
-      autocompleteValue.value = propValue.value;
+      autocompleteValue.value = propValue.value
     }
   } else {
-    autocompleteValue.value = propValue.value;
+    autocompleteValue.value = propValue.value
   }
 } else {
-  autocompleteValue.value = "";
+  autocompleteValue.value = ''
 }
-const autocompleteEntered = ref(false);
+const autocompleteEntered = ref(false)
 const sendValueAutocomplete = (value) => {
-  const find = fieldChoices.value.find((c) => c.value === value);
+  const find = fieldChoices.value.find((c) => c.value === value)
   // log("sendValueAutocomplete", value, find);
   if (find) {
-    autocompleteValue.value = find.label;
-    sendValue(find.value);
+    autocompleteValue.value = find.label
+    sendValue(find.value)
     // show readable value in the table in case of autocomplete field in TableField
     const labelKey = `${props.field.name}__${props.field.reference_label_column}`
-    emit("update:values", { [labelKey]: find.label });
-    sendError();
+    emit('update:values', { [labelKey]: find.label })
+    sendError()
   } else {
-    autocompleteValue.value = value;
-    sendValue(value); // 为了rule校验能获取到错误的值
+    autocompleteValue.value = value
+    sendValue(value) // 为了rule校验能获取到错误的值
   }
-};
+}
 const onAutocompleteSelect = (event) => {
   // log("onAutocompleteSelect", event);
-};
+}
 const onAutocompleteChange = (value) => {
   //为了在preload=false的情形下, updateForm时focus然后又blur不进行检测
-  autocompleteEntered.value = true;
-};
-const tag = computed(() => props.field.tag);
+  autocompleteEntered.value = true
+}
+const tag = computed(() => props.field.tag)
 const showChoicesWhenSmall = async (field) => {
-  const limit = field.max_display_count || Number(process.env.MAX_DISPLAY_COUNT || 100);
+  const limit = field.max_display_count || Number(process.env.MAX_DISPLAY_COUNT || 100)
   // preload=true点击的时候需要加能显示下拉列表
-  await nextTick();
-  searchOptions.value = fieldChoices.value.slice(0, limit);
-};
+  await nextTick()
+  searchOptions.value = fieldChoices.value.slice(0, limit)
+}
 const onAutocompleteBlur = (event) => {
-  const value = event.target.value;
+  const value = event.target.value
   if (!autocompleteEntered.value) {
     //为了在preload=false的情形下, updateForm时focus然后又blur不进行检测
   } else if (value) {
-    const find = fieldChoices.value.find((c) => c.label === value);
+    const find = fieldChoices.value.find((c) => c.label === value)
     if (!find) {
-      sendError(`输入错误, 请点击下拉列表输入`);
+      sendError(`输入错误, 请点击下拉列表输入`)
     } else {
-      sendValue(find.value); // 用户有可能手动输入了完整的label,没有点击下拉列表,所以这里要更新modelValue
-      sendError();
+      sendValue(find.value) // 用户有可能手动输入了完整的label,没有点击下拉列表,所以这里要更新modelValue
+      sendError()
     }
   } else if (props.field.required) {
-    sendError(`请选择${props.field.label}`);
+    sendError(`请选择${props.field.label}`)
   } else {
-    sendError();
+    sendError()
   }
-};
+}
 const onAutocompleteSearch = async (text) => {
   // log("onAutocompleteSearch", text);
   if (!text) {
-    await showChoicesWhenSmall(props.field);
-    return;
+    await showChoicesWhenSmall(props.field)
+    return
   }
-  if (typeof props.field.choices == "function") {
-    searchOptions.value = (await props.field.choices({ keyword: text })).map(normalize_choice);
+  if (typeof props.field.choices == 'function') {
+    searchOptions.value = (await props.field.choices({ keyword: text })).map(normalize_choice)
   } else {
-    const matchRule = new RegExp(text.split("").join(".*"));
+    const matchRule = new RegExp(text.split('').join('.*'))
     searchOptions.value = fieldChoices.value.filter((e) => {
       // 暂时只针对字符串过滤
-      if (typeof e.label == "string") {
-        return e.label.includes(text) || matchRule.test(e.label);
+      if (typeof e.label == 'string') {
+        return e.label.includes(text) || matchRule.test(e.label)
       } else {
-        return true;
+        return true
       }
-    });
+    })
   }
-};
+}
 const onAutocompleteFocus = async () => {
   if (!currentChoiceLabel.value) {
-    await showChoicesWhenSmall(props.field);
+    await showChoicesWhenSmall(props.field)
   }
-};
+}
 const onDatetimeChange = (date, datetime) => {
-  sendValue(datetime);
-};
+  sendValue(datetime)
+}
 const datetimeLocaleValue = computed(() =>
   // 如果不使用dayjs,则time部分始终是00:00:00
-  props.modelValue ? dayjs(props.modelValue, "YYYY-MM-DD HH:mm") : "",
-);
+  props.modelValue ? dayjs(props.modelValue, 'YYYY-MM-DD HH:mm') : '',
+)
 const wxLocationAddress = computed(() => {
-  const location = props.modelValue;
-  const address = location ? `${location.name}（${location.address}）` : "";
-  return address;
-});
+  const location = props.modelValue
+  const address = location ? `${location.name}（${location.address}）` : ''
+  return address
+})
 const aliossCommonProps = computed(() => {
   const commonProps = {
     fileList: props.modelValue,
-    "onUpdate:fileList": (value) => {
+    'onUpdate:fileList': (value) => {
       if (!props.error) {
-        sendValue(value);
+        sendValue(value)
       }
     },
     beforeUpload: (file) => {
-      sendError();
+      sendError()
       if (file.size > props.field.size) {
-        sendError(`不能超过${props.field.size_arg}`);
-        return false;
+        sendError(`不能超过${props.field.size_arg}`)
+        return false
       }
     },
     data: Alioss.makeAntdDataCallback(props.field),
     action: props.field.upload_url || process.env.ALIOSS_URL,
     multiple: props.field.attrs.multiple ?? false,
     maxCount: props.field.limit,
-  };
-  if (fieldType.value == "alioss_image" || fieldType.value == "alioss") {
-    commonProps.maxCount = 1;
   }
-  return commonProps;
-});
+  if (fieldType.value == 'alioss_image' || fieldType.value == 'alioss') {
+    commonProps.maxCount = 1
+  }
+  return commonProps
+})
 </script>
 <template>
   <div>
@@ -348,13 +348,13 @@ const aliossCommonProps = computed(() => {
       >
         <div>
           <PlusOutlined />
-          <div>{{ field.attrs.button_text || "上传图片" }}</div>
+          <div>{{ field.attrs.button_text || '上传图片' }}</div>
         </div>
       </a-upload>
       <a-upload v-else v-bind="aliossCommonProps" :disabled="field.disabled">
         <a-button>
           <UploadOutlined />
-          {{ field.attrs.button_text || "上传文件" }}
+          {{ field.attrs.button_text || '上传文件' }}
         </a-button>
       </a-upload>
     </template>

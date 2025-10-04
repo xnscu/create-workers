@@ -42,11 +42,11 @@ await esbuild.build({
           const result = await resolve('prompts/lib/index.js', {
             importer,
             resolveDir,
-            kind: 'import-statement'
+            kind: 'import-statement',
           })
           return result
         })
-      }
+      },
     },
     esbuildPluginLicense({
       thirdParty: {
@@ -63,7 +63,7 @@ await esbuild.build({
               `\n## Licenses of bundled dependencies\n\n` +
               `The published create artifact additionally contains code with the following licenses:\n` +
               [...new Set(dependencies.map((dependency) => dependency.packageJson.license))].join(
-                ', '
+                ', ',
               ) +
               '\n\n' +
               `## Bundled dependencies\n\n` +
@@ -83,9 +83,9 @@ await esbuild.build({
                 .join('\n\n')
 
             return licenseText
-          }
-        }
-      }
-    })
-  ]
+          },
+        },
+      },
+    }),
+  ],
 })

@@ -1,66 +1,64 @@
-import { NotFoundError, MethodNotAllowedError } from './router.mjs';
-import Router from './router.mjs';
+import { NotFoundError, MethodNotAllowedError } from './router.mjs'
+import Router from './router.mjs'
 
 export class ClassView {
-
-  static ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
-  static NotFoundError = NotFoundError;
-  static MethodNotAllowedError = MethodNotAllowedError;
+  static ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
+  static NotFoundError = NotFoundError
+  static MethodNotAllowedError = MethodNotAllowedError
 
   constructor() {
-    this.dispatch = this.dispatch.bind(this);
+    this.dispatch = this.dispatch.bind(this)
   }
 
   async dispatch(request, env, ctx) {
-    const method = request.method.toUpperCase();
-    const methodName = method.toLowerCase();
+    const method = request.method.toUpperCase()
+    const methodName = method.toLowerCase()
     if (typeof this[methodName] === 'function') {
-      return await this[methodName](request, env, ctx);
+      return await this[methodName](request, env, ctx)
     } else {
-      return this.methodNotAllowed(request, env, ctx);
+      return this.methodNotAllowed(request, env, ctx)
     }
   }
 
   methodNotAllowed(request, env, ctx) {
-    const allowedMethods = this.getAllowedMethods();
-    return Router.methodNotAllowedResponse(request, allowedMethods);
+    const allowedMethods = this.getAllowedMethods()
+    return Router.methodNotAllowedResponse(request, allowedMethods)
   }
 
   getAllowedMethods() {
-    const methods = [];
+    const methods = []
     for (const method of ClassView.ALLOWED_METHODS) {
-      const methodName = method.toLowerCase();
+      const methodName = method.toLowerCase()
       if (typeof this[methodName] === 'function') {
-        methods.push(method);
+        methods.push(method)
       }
     }
-    return methods;
+    return methods
   }
 
   async head(request, env, ctx) {
     if (typeof this.get === 'function') {
-      const response = await this.get(request, env, ctx);
+      const response = await this.get(request, env, ctx)
       if (response instanceof Response) {
         return new Response(null, {
           status: response.status,
-          headers: response.headers
-        });
+          headers: response.headers,
+        })
       }
     }
-    return this.methodNotAllowed(request, env, ctx);
+    return this.methodNotAllowed(request, env, ctx)
   }
 
   async options(request, env, ctx) {
-    const allowedMethods = this.getAllowedMethods();
+    const allowedMethods = this.getAllowedMethods()
     return new Response(null, {
       status: 200,
       headers: {
-        'Allow': allowedMethods.join(', '),
-        'Content-Length': '0'
-      }
-    });
+        Allow: allowedMethods.join(', '),
+        'Content-Length': '0',
+      },
+    })
   }
 }
 
-
-export default ClassView;
+export default ClassView

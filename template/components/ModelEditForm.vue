@@ -1,8 +1,8 @@
 <route lang="yaml"></route>
 <script setup>
-import { computed, ref, createVNode } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { Modal } from "ant-design-vue";
+import { computed, ref, createVNode } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Modal } from 'ant-design-vue'
 
 const props = defineProps({
   model: { type: [Object, Function], required: true },
@@ -10,8 +10,8 @@ const props = defineProps({
   successRoute: { type: Object },
   formLabelCol: { type: Number, default: 4 },
   actionUrl: { type: String },
-});
-const editNames = computed(() => props.formNames || props.model.admin?.form_names);
+})
+const editNames = computed(() => props.formNames || props.model.admin?.form_names)
 </script>
 <template>
   <model-form

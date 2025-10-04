@@ -5,8 +5,8 @@ const props = defineProps({
   field: { type: Object, required: true },
   record: { type: Object, required: true },
   value: {},
-});
-const tagColorArray = ["geekblue", "orange", "green", "cyan", "red", "blue", "purple"];
+})
+const tagColorArray = ['geekblue', 'orange', 'green', 'cyan', 'red', 'blue', 'purple']
 const textTypes = {
   string: true,
   sfzh: true,
@@ -23,61 +23,61 @@ const textTypes = {
   time: true,
   foreignkey: true,
   boolean: true,
-};
-const fieldValue = computed(() => props.value ?? props.record[props.field.name]);
+}
+const fieldValue = computed(() => props.value ?? props.record[props.field.name])
 const arrayLabelValue = computed(() => {
   if (props.field.choices) {
-    return fieldValue.value.map((v) => props.field.choices.find((c) => c.value === v)?.label);
+    return fieldValue.value.map((v) => props.field.choices.find((c) => c.value === v)?.label)
   } else {
-    return fieldValue.value;
+    return fieldValue.value
   }
-});
+})
 const fkValue = computed(() => {
-  const rc = props.field.reference_column;
-  const rlc = props.field.reference_label_column;
-  if (typeof fieldValue.value == "object") {
+  const rc = props.field.reference_column
+  const rlc = props.field.reference_label_column
+  if (typeof fieldValue.value == 'object') {
     if (rlc && fieldValue.value[rlc] !== undefined) {
-      return fieldValue.value[rlc];
+      return fieldValue.value[rlc]
     } else {
-      return fieldValue.value[rc];
+      return fieldValue.value[rc]
     }
   } else {
     if (rlc && props.record[`${props.field.name}__${rlc}`] !== undefined) {
-      return props.record[`${props.field.name}__${rlc}`];
+      return props.record[`${props.field.name}__${rlc}`]
     } else {
-      return fieldValue.value;
+      return fieldValue.value
     }
   }
-});
-const showDetail = ref(false);
+})
+const showDetail = ref(false)
 const tableFieldColumns = computed(() => [
-  { title: "#", key: "#" },
+  { title: '#', key: '#' },
   ...(props.field.detail_columns || props.field.columns || props.field.model.names).map((name) => ({
     title: props.field.model.name_to_label[name],
     key: name,
   })),
-]);
+])
 const avatarUrl = computed(() =>
   Array.isArray(fieldValue.value) ? fieldValue.value[0].ossUrl : fieldValue.value,
-);
-const previewVisible = ref(false);
+)
+const previewVisible = ref(false)
 const previewImage = () => {
-  previewVisible.value = true;
-};
-const previewVisibles = ref([]);
+  previewVisible.value = true
+}
+const previewVisibles = ref([])
 const previewImages = (i) => {
-  previewVisibles.value[i] = true;
-};
+  previewVisibles.value[i] = true
+}
 </script>
 <template>
   <template v-if="field.type === 'foreignkey'">
     {{ fkValue }}
   </template>
   <template v-else-if="field.type === 'json' && field.attrs.wx_lbs">
-    {{ fieldValue ? `${fieldValue.name}（${fieldValue.address}）` : "" }}
+    {{ fieldValue ? `${fieldValue.name}（${fieldValue.address}）` : '' }}
   </template>
   <template v-else-if="field.type === 'boolean'">
-    {{ fieldValue ? "是" : "否" }}
+    {{ fieldValue ? '是' : '否' }}
   </template>
   <template v-else-if="field.type === 'datetime'">
     {{ fieldValue?.slice(0, -6) }}

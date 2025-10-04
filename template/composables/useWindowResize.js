@@ -1,5 +1,5 @@
-import { watch } from "vue";
-import { useBreakpoints, useWindowSize } from "@vueuse/core";
+import { watch } from 'vue'
+import { useBreakpoints, useWindowSize } from '@vueuse/core'
 
 /**
  * 响应式的窗口大小监听组合式函数
@@ -9,13 +9,13 @@ import { useBreakpoints, useWindowSize } from "@vueuse/core";
  * @returns {Object} 返回窗口相关的响应式状态
  */
 export function useWindowResize(options = {}) {
-  const { mobileBreakpoint = 768, onResize: customOnResize } = options;
+  const { mobileBreakpoint = 768, onResize: customOnResize } = options
 
   const breakpoints = useBreakpoints({
     mobile: mobileBreakpoint,
-  });
-  const { width: windowWidth, height: windowHeight } = useWindowSize();
-  const isMobile = breakpoints.smaller("mobile");
+  })
+  const { width: windowWidth, height: windowHeight } = useWindowSize()
+  const isMobile = breakpoints.smaller('mobile')
 
   if (customOnResize) {
     watch(
@@ -25,15 +25,15 @@ export function useWindowResize(options = {}) {
           width: windowWidth.value,
           height: windowHeight.value,
           isMobile: isMobile.value,
-        });
+        })
       },
       { immediate: true },
-    );
+    )
   }
 
   return {
     windowWidth,
     windowHeight,
     isMobile,
-  };
+  }
 }

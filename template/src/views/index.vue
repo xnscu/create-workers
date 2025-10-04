@@ -1,5 +1,5 @@
 <script setup>
-const { user } = useSession();
+const { user } = useSession()
 </script>
 <template>
   <vitex-hello />

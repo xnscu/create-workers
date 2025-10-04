@@ -1,9 +1,9 @@
 <route lang="yaml"></route>
 <script setup>
-import { computed, ref, createVNode } from "vue";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
-import ModelBatchButton from "~/components/ModelBatchButton.vue";
-import { Modal } from "ant-design-vue";
+import { computed, ref, createVNode } from 'vue'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import ModelBatchButton from '~/components/ModelBatchButton.vue'
+import { Modal } from 'ant-design-vue'
 // import "ant-design-vue/lib/modal/style/css";
 // import "ant-design-vue/lib/notification/style/css";
 
@@ -13,25 +13,25 @@ const props = defineProps({
   names: { type: Array },
   form_names: { type: Array },
   columns: { type: Array },
-  uniqueKey: { type: String, default: "" },
-  downloadUrl: { type: String, default: "" },
-  formWidth: { type: String, default: "70%" }, // 低于ModelPanel的formWidth以便有层次感
+  uniqueKey: { type: String, default: '' },
+  downloadUrl: { type: String, default: '' },
+  formWidth: { type: String, default: '70%' }, // 低于ModelPanel的formWidth以便有层次感
   hideDownload: { type: Boolean, default: true },
   hideUpload: { type: Boolean, default: true },
-});
-const emit = defineEmits(["update:modelValue", "deleteRow", "read"]);
-const adminModel = shallowRef(props.model);
-const dataSource = computed(() => props.modelValue);
+})
+const emit = defineEmits(['update:modelValue', 'deleteRow', 'read'])
+const adminModel = shallowRef(props.model)
+const dataSource = computed(() => props.modelValue)
 const toAntdColumns = (names) => {
   return names.map((k) => ({
     title: adminModel.value.name_to_label[k],
     dataIndex: k,
     field: adminModel.value.fields[k],
-  }));
-};
+  }))
+}
 
 const tableColumns = computed(() => [
-  { title: "#", dataIndex: "#" },
+  { title: '#', dataIndex: '#' },
   ...toAntdColumns(
     props.columns ||
       props.form_names ||
@@ -39,44 +39,44 @@ const tableColumns = computed(() => [
       adminModel.value.admin?.list_names ||
       adminModel.value.names,
   ),
-  { title: "操作", dataIndex: "__action__" },
-]);
+  { title: '操作', dataIndex: '__action__' },
+])
 
 const findDuplicates = (rows) => {
-  console.log("findDuplicates", { rows });
-};
+  console.log('findDuplicates', { rows })
+}
 
-const editRecord = ref(null);
-const showUpdateForm = computed(() => !!editRecord.value);
-const showCreateForm = ref(false);
+const editRecord = ref(null)
+const showUpdateForm = computed(() => !!editRecord.value)
+const showCreateForm = ref(false)
 
 const uniqueKey = computed(
   () => props.uniqueKey || Object.values(adminModel.value.fields).find((f) => f.unique)?.name,
-);
+)
 const deleteRecord = (index) => {
   Modal.confirm({
-    icon: createVNode(ExclamationCircleOutlined, { style: { color: "red" } }),
-    content: "确认删除这条记录吗",
-    okText: "删除",
-    okType: "danger",
+    icon: createVNode(ExclamationCircleOutlined, { style: { color: 'red' } }),
+    content: '确认删除这条记录吗',
+    okText: '删除',
+    okType: 'danger',
     onOk() {
-      emit("deleteRow", index);
+      emit('deleteRow', index)
     },
-    cancelText: "取消",
-  });
-};
+    cancelText: '取消',
+  })
+}
 const onSuccessCreate = (data) => {
-  dataSource.value.push(data);
-  showCreateForm.value = false;
-};
+  dataSource.value.push(data)
+  showCreateForm.value = false
+}
 const onSuccessUpdate = (data) => {
-  Object.assign(editRecord.value, data);
-  editRecord.value = null;
-};
+  Object.assign(editRecord.value, data)
+  editRecord.value = null
+}
 const onClickEdit = (record) => {
-  editRecord.value = record;
-};
-const tagColorArray = ["geekblue", "orange", "green", "cyan", "red", "blue", "purple"];
+  editRecord.value = record
+}
+const tagColorArray = ['geekblue', 'orange', 'green', 'cyan', 'red', 'blue', 'purple']
 </script>
 <template>
   <a-row type="flex" justify="space-between">

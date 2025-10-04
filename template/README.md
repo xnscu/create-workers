@@ -3,11 +3,13 @@
 ## 安装依赖
 
 ### 基础依赖
+
 ```bash
 npm install
 ```
 
 ### 可选依赖
+
 如果需要使用以下功能，请安装对应的包：
 
 ```bash
@@ -34,6 +36,7 @@ npm install qrcode@^1.5.1
 ```
 
 ### 一键安装所有可选依赖
+
 ```bash
 npm install file-saver@^2.0.5 https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz docx-templates@^4.13.0 @xnscu/docx@^9.0.3 @xnscu/xlsx-template@^1.4.5 @xnscu/tinymce@^0.7.0 qrcode@^1.5.1
 ```

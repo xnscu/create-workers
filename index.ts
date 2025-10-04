@@ -2,7 +2,7 @@
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import os from 'os';
+import os from 'os'
 
 import minimist from 'minimist'
 import prompts from 'prompts'
@@ -71,7 +71,7 @@ function emptyDir(dir) {
   postOrderDirectoryTraverse(
     dir,
     (dir) => fs.rmdirSync(dir),
-    (file) => fs.unlinkSync(file)
+    (file) => fs.unlinkSync(file),
   )
 }
 
@@ -117,7 +117,7 @@ function parseEnv(src) {
   return obj
 }
 const envContext: any = parseEnv(
-  fs.readFileSync(path.resolve(__dirname, '.env'), { encoding: 'utf8' })
+  fs.readFileSync(path.resolve(__dirname, '.env'), { encoding: 'utf8' }),
 )
 
 const normalizeArgv = (argv) => {
@@ -142,22 +142,22 @@ const normalizeArgv = (argv) => {
   }
   return d
 }
-const GH_CONFIG_PATH = `${os.homedir()}/.config/gh/hosts.yml`;
+const GH_CONFIG_PATH = `${os.homedir()}/.config/gh/hosts.yml`
 function getGhConfig() {
-	if (fs.existsSync(GH_CONFIG_PATH)) {
-		const hosts = fs.readFileSync(GH_CONFIG_PATH, "utf8");
-    const gh_user_match = hosts.match(/\s+user:\s*([^\n\r]+)/);
-		if (gh_user_match) {
-			return {user: gh_user_match[1]}
-		}
-	}
+  if (fs.existsSync(GH_CONFIG_PATH)) {
+    const hosts = fs.readFileSync(GH_CONFIG_PATH, 'utf8')
+    const gh_user_match = hosts.match(/\s+user:\s*([^\n\r]+)/)
+    if (gh_user_match) {
+      return { user: gh_user_match[1] }
+    }
+  }
 }
 async function init() {
   console.log()
   console.log(
     process.stdout.isTTY && process.stdout.getColorDepth() > 8
       ? banners.gradientBanner
-      : banners.defaultBanner
+      : banners.defaultBanner,
   )
   console.log()
   const cwd = process.cwd()
@@ -174,11 +174,11 @@ async function init() {
     alias: {
       typescript: ['ts'],
       'with-tests': ['tests'],
-      router: ['vue-router']
+      router: ['vue-router'],
     },
     string: ['_'],
     // all arguments are treated as booleans
-    boolean: true
+    boolean: true,
   })
   const normalizedArgv = normalizeArgv(argv)
 
@@ -188,7 +188,7 @@ async function init() {
 
   let result: {
     projectName?: string
-    userName?: string,
+    userName?: string
     shouldOverwrite?: boolean
     packageName?: string
     isProduction?: boolean
@@ -206,14 +206,14 @@ async function init() {
           type: targetDir ? null : 'text',
           message: 'Project name:',
           initial: 'vitex-project',
-          onState: (state) => (targetDir = String(state.value).trim() || 'vitex-project')
+          onState: (state) => (targetDir = String(state.value).trim() || 'vitex-project'),
         },
         {
           name: 'userName',
           type: argv.user ? null : 'text',
           message: 'github username:',
           initial: getGhConfig()?.user ?? 'vitex-user',
-          validate: (dir) => isValidPackageName(dir) || 'Invalid github username'
+          validate: (dir) => isValidPackageName(dir) || 'Invalid github username',
         },
         {
           name: 'shouldOverwrite',
@@ -226,7 +226,7 @@ async function init() {
           },
           initial: true,
           active: 'Yes',
-          inactive: 'No'
+          inactive: 'No',
         },
         {
           name: 'overwriteChecker',
@@ -235,7 +235,7 @@ async function init() {
               throw new Error(red('✖') + ` Operation cancelled`)
             }
             return null
-          }
+          },
         },
 
         {
@@ -243,14 +243,14 @@ async function init() {
           type: () => (isValidPackageName(targetDir) ? null : 'text'),
           message: 'Package name:',
           initial: () => toValidPackageName(targetDir),
-          validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name'
-        }
+          validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name',
+        },
       ],
       {
         onCancel: () => {
           throw new Error(red('✖') + ` Operation cancelled`)
-        }
-      }
+        },
+      },
     )
   } catch (cancelled) {
     console.log(cancelled.message)
@@ -282,13 +282,13 @@ async function init() {
 
   const pkg = { name: packageName, version: '0.0.0' }
   await exec(
-    `uname -s | grep -q Darwin && brew services start postgresql@15 || service postgresql start`
+    `uname -s | grep -q Darwin && brew services start postgresql@15 || service postgresql start`,
   )
-// boot.cjs
-//   await exec(`sudo -u postgres psql -w postgres <<EOF
-//   ALTER USER postgres PASSWORD '${PGPASSWORD}';
-//   CREATE DATABASE ${packageName};
-// EOF`)
+  // boot.cjs
+  //   await exec(`sudo -u postgres psql -w postgres <<EOF
+  //   ALTER USER postgres PASSWORD '${PGPASSWORD}';
+  //   CREATE DATABASE ${packageName};
+  // EOF`)
   fs.writeFileSync(path.resolve(root, 'package.json'), JSON.stringify(pkg, null, 2))
 
   // todo:
@@ -311,19 +311,19 @@ async function init() {
   const updatedPkg = sortDependencies(
     deepMerge(existingPkg, {
       name: projectName,
-      "repository": {
-        "type": "git",
-        "url": `git+https://github.com/${userName}/${projectName}.git`
+      repository: {
+        type: 'git',
+        url: `git+https://github.com/${userName}/${projectName}.git`,
       },
-      "bugs": {
-        "url": `https://github.com/${userName}/${projectName}/issues`
+      bugs: {
+        url: `https://github.com/${userName}/${projectName}/issues`,
       },
-      "homepage": `https://github.com/${userName}/${projectName}#readme`,
+      homepage: `https://github.com/${userName}/${projectName}#readme`,
       scripts: {
         'set-g': `git remote set-url origin git@github.com:${userName}/${projectName}.git`,
         'add-g': `git remote add origin git@github.com:${userName}/${projectName}.git`,
-      }
-    })
+      },
+    }),
   )
   console.log({ argv, normalizedArgv, targetDir, projectName, userName })
   fs.writeFileSync(packageJsonPath, JSON.stringify(updatedPkg, null, 2) + '\n', 'utf-8')
@@ -352,14 +352,14 @@ async function init() {
           PGPASSWORD,
           TARGET_DIR: targetDir,
           PGDATABASE: projectName,
-          VITE_NAME: projectName
+          VITE_NAME: projectName,
         }
         const content = ejs.render(template, context)
 
         fs.writeFileSync(dest, content)
         fs.unlinkSync(filepath)
       }
-    }
+    },
   )
 
   // Cleanup.
@@ -370,20 +370,16 @@ async function init() {
   // (Currently it's only `cypress/plugin/index.ts`, but we might add more in the future.)
   // (Or, we might completely get rid of the plugins folder as Cypress 10 supports `cypress.config.ts`)
 
-
-
   // Instructions:
   // Supported package managers: pnpm > yarn > npm
   const userAgent = process.env.npm_config_user_agent ?? ''
   const packageManager = /pnpm/.test(userAgent) ? 'pnpm' : /yarn/.test(userAgent) ? 'yarn' : 'npm'
 
-
-
   console.log(`\nDone. Now run:\n`)
   if (root !== cwd) {
     const cdProjectName = path.relative(cwd, root)
     console.log(
-      `  ${bold(green(`cd ${cdProjectName.includes(' ') ? `"${cdProjectName}"` : cdProjectName}`))}`
+      `  ${bold(green(`cd ${cdProjectName.includes(' ') ? `"${cdProjectName}"` : cdProjectName}`))}`,
     )
   }
   // console.log(`  ${bold(green(getCommand(packageManager, 'init-github')))}`)

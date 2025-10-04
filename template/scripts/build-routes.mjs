@@ -1,96 +1,100 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const apiDir = path.join(__dirname, '../worker');
-const outputFile = path.join(__dirname, '../worker/index.mjs');
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const apiDir = path.join(__dirname, '../worker')
+const outputFile = path.join(__dirname, '../worker/index.mjs')
 
 // Dynamically check if file exports ClassView subclass
 async function isClassViewFile(filePath) {
   try {
     // Use file:// URL for import
-    const fileUrl = 'file://' + filePath;
+    const fileUrl = 'file://' + filePath
 
     // Dynamic import module
-    const module = await import(fileUrl);
-    const exportedClass = module.default || module;
+    const module = await import(fileUrl)
+    const exportedClass = module.default || module
 
     // Check if it's a class and inherits from ClassView
     if (typeof exportedClass === 'function' && exportedClass.prototype) {
       // Import ClassView for comparison
-      const { ClassView } = await import('../lib/classview.mjs');
+      const { ClassView } = await import('../lib/classview.mjs')
 
       // Check prototype chain
-      let proto = exportedClass.prototype;
+      let proto = exportedClass.prototype
       while (proto) {
         if (proto.constructor === ClassView) {
-          return true;
+          return true
         }
-        proto = Object.getPrototypeOf(proto);
+        proto = Object.getPrototypeOf(proto)
         // Avoid infinite loop
         if (proto === Object.prototype) {
-          break;
+          break
         }
       }
     }
 
-    return false;
+    return false
   } catch (err) {
     // If dynamic import fails, fallback to static analysis
-    console.warn(`Unable to dynamically check file ${filePath}, falling back to static analysis: ${err.message}`);
+    console.warn(
+      `Unable to dynamically check file ${filePath}, falling back to static analysis: ${err.message}`,
+    )
     try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      return content.includes('extends ClassView') ||
-             content.includes('ClassView') ||
-             content.includes('from ') && content.includes('classview');
+      const content = fs.readFileSync(filePath, 'utf8')
+      return (
+        content.includes('extends ClassView') ||
+        content.includes('ClassView') ||
+        (content.includes('from ') && content.includes('classview'))
+      )
     } catch (staticErr) {
-      console.warn(`Static analysis also failed: ${staticErr.message}`);
-      return false;
+      console.warn(`Static analysis also failed: ${staticErr.message}`)
+      return false
     }
   }
 }
 
 async function scanApiFiles(dir, basePath = '') {
-  const routes = [];
+  const routes = []
 
   if (!fs.existsSync(dir)) {
-    console.log('API directory does not exist, creating empty route index');
-    return routes;
+    console.log('API directory does not exist, creating empty route index')
+    return routes
   }
 
-  const files = fs.readdirSync(dir);
+  const files = fs.readdirSync(dir)
 
   for (const file of files) {
-    const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
+    const fullPath = path.join(dir, file)
+    const stat = fs.statSync(fullPath)
 
     if (stat.isDirectory()) {
       // Recursively scan subdirectories
-      routes.push(...await scanApiFiles(fullPath, path.join(basePath, file)));
+      routes.push(...(await scanApiFiles(fullPath, path.join(basePath, file))))
     } else if ((file.endsWith('.mjs') || file.endsWith('.js')) && file.split('.')[0] !== 'index') {
       // Generate route path
-      const routePath = path.join(basePath, file.replace(/\.(mjs|js)$/, ''));
-      const normalizedPath = '/' + routePath.replace(/\\/g, '/');
-      const importPath = './' + path.join(basePath, file).replace(/\\/g, '/');
+      const routePath = path.join(basePath, file.replace(/\.(mjs|js)$/, ''))
+      const normalizedPath = '/' + routePath.replace(/\\/g, '/')
+      const importPath = './' + path.join(basePath, file).replace(/\\/g, '/')
 
       // Dynamically check if it's a ClassView file
-      const isClassView = await isClassViewFile(fullPath);
+      const isClassView = await isClassViewFile(fullPath)
 
       routes.push({
         path: normalizedPath === '/index' ? '/' : normalizedPath,
         importPath,
         filename: file,
-        isClassView
-      });
+        isClassView,
+      })
     }
   }
 
-  return routes;
+  return routes
 }
 
 // Scan API files (now async function)
-const routes = await scanApiFiles(apiDir);
+const routes = await scanApiFiles(apiDir)
 
 // Generate route index file
 const indexContent = `// Auto-generated route index file
@@ -99,13 +103,15 @@ const indexContent = `// Auto-generated route index file
 import Router from "../lib/router.mjs";
 import { ClassView } from "../lib/classview.mjs";
 
-${routes.map((route, index) => {
-  if (route.isClassView) {
-    return `import Route${index}Module from '${route.importPath}';`;
-  } else {
-    return `import route${index} from '${route.importPath}';`;
-  }
-}).join('\n')}
+${routes
+  .map((route, index) => {
+    if (route.isClassView) {
+      return `import Route${index}Module from '${route.importPath}';`
+    } else {
+      return `import route${index} from '${route.importPath}';`
+    }
+  })
+  .join('\n')}
 
 function wrapClassView(ViewClass) {
   if (ViewClass.prototype instanceof ClassView || ViewClass === ClassView) {
@@ -118,13 +124,15 @@ function wrapClassView(ViewClass) {
 }
 
 export const routes = [
-${routes.map((route, index) => {
-  if (route.isClassView) {
-    return `  ['${route.path}', wrapClassView(Route${index}Module.default || Route${index}Module)]`;
-  } else {
-    return `  ['${route.path}', route${index}]`;
-  }
-}).join(',\n')}
+${routes
+  .map((route, index) => {
+    if (route.isClassView) {
+      return `  ['${route.path}', wrapClassView(Route${index}Module.default || Route${index}Module)]`
+    } else {
+      return `  ['${route.path}', route${index}]`
+    }
+  })
+  .join(',\n')}
 ];
 const router = Router.create(routes);
 
@@ -202,17 +210,17 @@ export default {
     }
   },
 };
-`;
+`
 
 // Ensure output directory exists
-fs.mkdirSync(path.dirname(outputFile), { recursive: true });
+fs.mkdirSync(path.dirname(outputFile), { recursive: true })
 
 // Write file
-fs.writeFileSync(outputFile, indexContent);
+fs.writeFileSync(outputFile, indexContent)
 
-console.log(`Route index file generated: ${outputFile}`);
-console.log(`Found ${routes.length} API files:`);
-routes.forEach(route => {
-  const typeLabel = route.isClassView ? '[ClassView]' : '[Function]';
-  console.log(`  ${typeLabel} ${route.path} -> ${route.importPath}`);
-});
+console.log(`Route index file generated: ${outputFile}`)
+console.log(`Found ${routes.length} API files:`)
+routes.forEach((route) => {
+  const typeLabel = route.isClassView ? '[ClassView]' : '[Function]'
+  console.log(`  ${typeLabel} ${route.path} -> ${route.importPath}`)
+})

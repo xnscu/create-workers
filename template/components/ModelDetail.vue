@@ -1,8 +1,8 @@
 <route lang="yaml"></route>
 <script setup>
-import { computed, ref, createVNode } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { Modal } from "ant-design-vue";
+import { computed, ref, createVNode } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Modal } from 'ant-design-vue'
 
 const props = defineProps({
   model: { type: [Object, Function], required: true },
@@ -10,7 +10,7 @@ const props = defineProps({
   detailNames: {
     type: Array,
     default(props) {
-      return props.model.admin?.detail_names || props.model.field_names;
+      return props.model.admin?.detail_names || props.model.field_names
     },
   },
   detailLabelCol: {
@@ -18,19 +18,19 @@ const props = defineProps({
     default(props) {
       const maxLabelLength = Math.max(
         ...props.detailNames.map((name) => props.model.fields[name]?.label?.length || 0),
-      );
-      return Math.min(maxLabelLength + 1, 9);
+      )
+      return Math.min(maxLabelLength + 1, 9)
     },
   },
-});
+})
 const detailFields = computed(() => {
-  const fields = [];
+  const fields = []
   for (const name of props.detailNames) {
-    const field = props.model.fields[name];
-    fields.push(field);
+    const field = props.model.fields[name]
+    fields.push(field)
   }
-  return fields;
-});
+  return fields
+})
 </script>
 <template>
   <template v-for="(field, i) in detailFields" :key="field.name">
