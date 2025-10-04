@@ -14,9 +14,9 @@ app.use(router);
 
 app.mount("#app");
 app.config.errorHandler = (error, instance, info) => {
-  console.error("全局错误捕获：", error.message);
+  console.error("global error captured:", error.message);
   if (typeof error == "object") {
-    if (error.name == "AxiosError") {
+    if (error.name == "AxiosError" && error.response) {
       const { data, status, request } = error.response;
       // console.log("AxiosError:", { data, status, request });
       if (status == 403) {
@@ -36,9 +36,10 @@ app.config.errorHandler = (error, instance, info) => {
         return Notice.error(error.response.data);
       }
     } else if (error.message !== "") {
-      // Http.post抛出的错误是空字符串,暂时不展示
       return Notice.error(error.message);
-    }
+    } else {
+        return Notice.error(error);
+      }
   }
   Notice.error(typeof error == "object" ? error.message : error);
 };
