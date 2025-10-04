@@ -108,3 +108,4 @@ typings/
 .tern-port
 
 .npmrc
+pnpm-lock.yaml
