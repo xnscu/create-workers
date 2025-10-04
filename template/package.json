@@ -19,11 +19,11 @@
     "build-routes": "mkdir -p dist; mkdir -p dist/client; node scripts/build-routes.mjs",
     "prebuild": "pnpm run build-routes",
     "predev": "pnpm run build-routes",
-    "dev": "dotenv -- wrangler dev",
+    "predeploy": "mkdir -p dist",
+    "dev": "dotenv -- vite",
     "build": "dotenv -- vite build",
     "preview": "npm run build && wrangler dev",
-    "predeploy": "mkdir -p dist",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "reset": "rm -rf node_modules; rm package-lock.json; rm pnpm-lock.yaml; pnpm i"
   },
   "dependencies": {
