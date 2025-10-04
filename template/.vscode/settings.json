@@ -32,5 +32,9 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "vite.config.mjs": "tsconfig*.json,vite*.mjs,vite*.ts"
   }
 }

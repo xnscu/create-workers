@@ -161,11 +161,11 @@ export default defineConfig({
       "@/": fileURLToPath(new URL("./src", import.meta.url)) + "/",
     },
   },
-  css: {```````
+  css: {
     preprocessorOptions: {
-      less: {`
+      less: {
         javascriptEnabled: true,
       },
     },
-  },`````
+  },
 });
