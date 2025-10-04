@@ -1,6 +1,6 @@
 {
   "name": "create-workers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Start an cloudflare workers + vue project, battery included",
   "type": "module",
   "bin": {
@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/xiangnanscu/create-workers#readme",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
+    "@tsconfig/node22": "^22.0.2",
     "@types/eslint": "^8.56.2",
     "@types/node": "^20.11.16",
     "@types/prompts": "^2.4.9",
