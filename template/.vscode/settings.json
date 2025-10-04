@@ -17,6 +17,7 @@
     "source.fixAll": "explicit",
     "source.fixAll.eslint": "explicit"
   },
+  "editor.formatOnPaste": true, // required
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   // make sure Vue SFCs are formatted by Prettier
