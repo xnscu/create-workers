@@ -3,7 +3,7 @@ import router from './router'
 import App from './App.vue'
 import { Model } from 'xodel/lib/model.mjs'
 import { BaseField } from 'xodel/lib/fields.mjs'
-import { request } from '~/lib/Http'
+import { request } from '~/lib/http'
 import 'ant-design-vue/dist/reset.css'
 
 Model.request = request

@@ -1,7 +1,7 @@
-import { NotFoundError, MethodNotAllowedError } from './router.mjs'
-import Router from './router.mjs'
+import { NotFoundError, MethodNotAllowedError } from './Router.mjs'
+import Router from './Router.mjs'
 
-export class ClassView {
+export default class ClassView {
   static ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
   static NotFoundError = NotFoundError
   static MethodNotAllowedError = MethodNotAllowedError
@@ -60,5 +60,3 @@ export class ClassView {
     })
   }
 }
-
-export default ClassView

@@ -4,7 +4,8 @@ import { notification } from 'ant-design-vue'
 const defaultOpts = {
   duration: 6,
 }
-class Notice {
+
+export default class Notice {
   constructor(opts) {
     notification[opts.type](opts)
   }
@@ -32,5 +33,3 @@ class Notice {
     })
   }
 }
-
-export default Notice

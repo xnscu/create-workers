@@ -20,11 +20,9 @@
   "editor.formatOnPaste": true, // required
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  // 确保使用项目本地的 Prettier 配置
   "prettier.requireConfig": true,
   "prettier.useEditorConfig": true,
   "prettier.resolveGlobalModules": false,
-  // 为不同文件类型指定格式化器
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
