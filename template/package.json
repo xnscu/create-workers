@@ -17,7 +17,7 @@
     "predev": "pnpm run br",
     "dev": "dotenv -- vite",
     "env": "dotenv -e .env -e .env.local --",
-    "format": "prettier --write .",
+    "format": "prettier --write . --config .prettierrc.json",
     "g": "npm run commit",
     "postg": "npm run postpush",
     "postinstall": "patch-package",

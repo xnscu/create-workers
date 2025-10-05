@@ -24,7 +24,7 @@
     "postpush": "uname -s | grep -q Darwin && yarn _push || while true; do timeout 10 yarn _push && break; done",
     "pull": "uname -s | grep -q Darwin && yarn _pull || while true; do timeout 10 yarn _pull && break; done",
     "lab": "pnpm build && ./outfile.cjs",
-    "format": "prettier --write .",
+    "format": "prettier --write . --config .prettierrc.json",
     "sync": "./scripts/sync.sh download",
     "build": "zx ./scripts/build.mjs",
     "snapshot": "zx ./scripts/snapshot.mjs",
