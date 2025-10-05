@@ -1,6 +1,6 @@
-<script setup>
-const { user } = useSession()
-</script>
+<script setup></script>
 <template>
-  <h1>{{ utils.capitalize(user.username) }}'s Home</h1>
+  <GlobalHello />
+  <LocalHello />
+  <h1>This is an index page</h1>
 </template>
