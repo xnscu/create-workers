@@ -1,7 +1,7 @@
 {
   "name": "create-workers",
-  "version": "0.6.0",
-  "description": "Start an cloudflare workers + vue project, battery included",
+  "version": "0.7.0",
+  "description": "Start an opinioned cloudflare workers + pages project with vue 3 + vite.",
   "type": "module",
   "bin": {
     "create": "outfile.cjs"
@@ -36,15 +36,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xiangnanscu/create-workers.git"
+    "url": "git+https://github.com/xnscu/create-workers.git"
   },
-  "keywords": [],
-  "author": "Nan Xiang <xiangnanscu@qq.com>",
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "vue",
+    "vite",
+    "primevue",
+    "vueuse"
+  ],
+  "author": "Nan Xiang <xnscu@qq.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xiangnanscu/create-workers/issues"
+    "url": "https://github.com/xnscu/create-workers/issues"
   },
-  "homepage": "https://github.com/xiangnanscu/create-workers#readme",
+  "homepage": "https://github.com/xnscu/create-workers#readme",
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/eslint": "^8.56.2",

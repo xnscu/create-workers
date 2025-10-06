@@ -26,9 +26,7 @@
     "pull": "npm run _pull",
     "push": "npm run commit",
     "postpush": "npm run _push",
-    "reset": "rm -rf node_modules; rm package-lock.json; rm pnpm-lock.yaml; pnpm i",
-    "add-g": "git remote add origin git@github.com:xiangnanscu/hhh.git",
-    "set-g": "git remote set-url origin git@github.com:xiangnanscu/hhh.git"
+    "reset": "rm -rf node_modules; rm package-lock.json; rm pnpm-lock.yaml; pnpm i"
   },
   "dependencies": {
     "@vueuse/core": "^9.6.0",

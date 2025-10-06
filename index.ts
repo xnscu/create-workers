@@ -205,8 +205,8 @@ async function init() {
           name: 'projectName',
           type: targetDir ? null : 'text',
           message: 'Project name:',
-          initial: 'vitex-project',
-          onState: (state) => (targetDir = String(state.value).trim() || 'vitex-project'),
+          initial: 'workers',
+          onState: (state) => (targetDir = String(state.value).trim() || 'workers'),
         },
         {
           name: 'userName',
