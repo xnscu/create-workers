@@ -1,0 +1,1 @@
+这是一个cloudflare workers项目，技术栈：pnpm + vite + vue3 + vueuse + primevue，后端api文件在worker文件夹下。路由是基于文件名进行组织的，由scripts/build-routes.mjs生成。
