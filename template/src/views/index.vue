@@ -1,7 +1,7 @@
 <script setup>
 import { useFetch } from '@vueuse/core'
 
-const { data, isFetching, error, execute } = useFetch('/api/hello', {
+const { data, isFetching, error, execute } = useFetch('/api/funcview', {
   immediate: false,
 })
 </script>
@@ -12,7 +12,7 @@ const { data, isFetching, error, execute } = useFetch('/api/hello', {
 
   <div style="margin-top: 20px">
     <button @click="execute" :disabled="isFetching">
-      {{ isFetching ? 'fetching...' : 'request /hello' }}
+      {{ isFetching ? 'fetching...' : 'click to request /api/funcview' }}
     </button>
 
     <div

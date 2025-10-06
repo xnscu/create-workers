@@ -228,6 +228,9 @@ class Router {
   }
 
   is_handler(handler) {
+    if (!handler) {
+      return false
+    }
     if (typeof handler === 'function' || typeof handler === 'string') {
       return true
     }
