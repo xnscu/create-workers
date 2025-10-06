@@ -9,49 +9,15 @@ const outputFile = path.join(__dirname, '../worker/index.mjs')
 // Dynamically check if file exports ClassView subclass
 async function isClassViewFile(filePath) {
   try {
-    // Use file:// URL for import
-    const fileUrl = 'file://' + filePath
-
-    // Dynamic import module
-    const module = await import(fileUrl)
-    const exportedClass = module.default || module
-
-    // Check if it's a class and inherits from ClassView
-    if (typeof exportedClass === 'function' && exportedClass.prototype) {
-      // Import ClassView for comparison
-      const { ClassView } = await import('../lib/ClassView.mjs')
-
-      // Check prototype chain
-      let proto = exportedClass.prototype
-      while (proto) {
-        if (proto.constructor === ClassView) {
-          return true
-        }
-        proto = Object.getPrototypeOf(proto)
-        // Avoid infinite loop
-        if (proto === Object.prototype) {
-          break
-        }
-      }
-    }
-
-    return false
-  } catch (err) {
-    // If dynamic import fails, fallback to static analysis
-    console.warn(
-      `Unable to dynamically check file ${filePath}, falling back to static analysis: ${err.message}`,
+    const content = fs.readFileSync(filePath, 'utf8')
+    return (
+      content.includes('extends ClassView') ||
+      content.includes('ClassView') ||
+      (content.includes('from ') && content.includes('ClassView'))
     )
-    try {
-      const content = fs.readFileSync(filePath, 'utf8')
-      return (
-        content.includes('extends ClassView') ||
-        content.includes('ClassView') ||
-        (content.includes('from ') && content.includes('ClassView'))
-      )
-    } catch (staticErr) {
-      console.warn(`Static analysis also failed: ${staticErr.message}`)
-      return false
-    }
+  } catch (staticErr) {
+    console.warn(`Static analysis also failed: ${staticErr.message}`)
+    return false
   }
 }
 
@@ -74,7 +40,11 @@ async function scanApiFiles(dir, basePath = '') {
       routes.push(...(await scanApiFiles(fullPath, path.join(basePath, file))))
     } else if ((file.endsWith('.mjs') || file.endsWith('.js')) && file.split('.')[0] !== 'index') {
       // Generate route path
-      const routePath = path.join(basePath, file.replace(/\.(mjs|js)$/, ''))
+      let routePath = path.join(basePath, file.replace(/\.(mjs|js)$/, ''))
+
+      // Convert [param] format to :param format
+      routePath = routePath.replace(/\[([^\]]+)\]/g, ':$1')
+
       const normalizedPath = '/' + routePath.replace(/\\/g, '/')
       const importPath = './' + path.join(basePath, file).replace(/\\/g, '/')
 
