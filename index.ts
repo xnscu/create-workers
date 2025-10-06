@@ -385,17 +385,13 @@ async function init() {
   // console.log(`  ${bold(green(getCommand(packageManager, 'init-github')))}`)
   console.log(`  ${bold(green(getCommand(packageManager, 'install')))}`)
   console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
-  const installUI = `npx -y cpgit primefaces/primevue -s=packages/primevue/src lib/primevue
-npx -y cpgit vueComponent/ant-design-vue -s=components lib/ant-design-vue`
-  console.log(`\nCopy PrimeVue and Ant-Design-Vue to lib folder:\n`)
-  console.log(bold(green(installUI)))
   console.log(`\nIf you want to initialize project as a github repo, run:\n`)
-  const githubCreateString = `
+  const githubCreateString = `\
   cd ${projectName} &&
   git init --initial-branch=master &&
   git add . &&
   git commit -am "initial commit by create-workers" &&
-  gh repo create ${projectName} --private --source=. && git push --set-upstream origin master`
+  gh repo create ${userName}/${projectName} --private --source=. && git push --set-upstream origin master`
   console.log(`  ${bold(green(githubCreateString))}`)
   console.log()
 }
