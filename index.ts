@@ -212,7 +212,7 @@ async function init() {
           name: 'userName',
           type: argv.user ? null : 'text',
           message: 'github username:',
-          initial: getGhConfig()?.user ?? 'vitex-user',
+          initial: getGhConfig()?.user ?? 'xnscu',
           validate: (dir) => isValidPackageName(dir) || 'Invalid github username',
         },
         {
