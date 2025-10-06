@@ -65,5 +65,8 @@ WORKDIR /workspace
 # 暴露常用端口
 EXPOSE 80 443 3000 5432 8080 5173 8000 8787
 
+# 创建 claude 命令别名
+RUN echo 'alias claude="claude --dangerously-skip-permissions"' >> /etc/bash.bashrc
+
 # 设置默认命令
 CMD ["/bin/bash"]
