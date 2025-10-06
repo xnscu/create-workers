@@ -183,7 +183,7 @@ async function init() {
   const normalizedArgv = normalizeArgv(argv)
 
   let targetDir = argv._[0]
-  const defaultProjectName = !targetDir ? 'vitex' : targetDir
+  const defaultProjectName = !targetDir ? 'workers' : targetDir
   const forceOverwrite = argv.force
 
   let result: {
