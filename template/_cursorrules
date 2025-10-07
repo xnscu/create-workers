@@ -7,3 +7,5 @@ lib放的是基础库文件。其中ClassView.mjs是原理类似于django classv
 src文件夹是经典的vue工程结构。
 由于使用了unplugin-vue-router/vite，src/views里面的vue文件会自动注册为同名路由，不用手动添加。
 worker文件夹存放的是后端api文件，scripts/build-routes.mjs会扫描这里面的js/mjs文件（除index.mjs之外），这些文件的default导出必须是函数（比如funcview.mjs）或ClassView子类（比如classview.mjs），再结合文件名注册路由到Router类，最后生成worker/index.mjs文件，这是本项目的请求处理核心，从这里可以看到，凡是以/api/开头的请求都会尝试在后端匹配，匹配的时候又删掉/api前缀再匹配，比如/api/funcview会匹配到worker/funcview.mjs文件，/api/classview会匹配到classview.mjs文件。
+优先使用vueuse，尽量不要自己造轮子。比如判断移动端使用@vueuse/core里面的useWindowSize。
+vue组件的编写请遵循社区最佳实践：https://vuejs.org/style-guide/。
