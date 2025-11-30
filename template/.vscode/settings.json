@@ -9,9 +9,7 @@
   "html.format.wrapLineLength": 80,
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
-    "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig",
-    "vite.config.mjs": "tsconfig*.json,vite*.mjs,vite*.ts",
-    ".gitignore": ".gitattributes"
+    "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig, .cursorrules, CLAUDE.md,.gitignore,.nvmrc,index.html,vite.config.mjs,tsconfig*.json,vite*.mjs,vite*.ts"
   },
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
