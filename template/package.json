@@ -62,7 +62,7 @@
     "unplugin-auto-import": "^0.16.6",
     "unplugin-vue-components": "^0.26.0",
     "unplugin-vue-router": "^0.10.2",
-    "vite": "npm:rolldown-vite@latest",
+    "vite": "latest",
     "vite-plugin-node-polyfills": "^0.15.0",
     "vite-plugin-vue-devtools": "^8.0.2",
     "vitest": "latest",
