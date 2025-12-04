@@ -22,8 +22,6 @@ import deepMerge from './utils/deepMerge'
 import { version } from './package.json'
 import util from 'util'
 
-const exec = util.promisify(require('child_process').exec)
-
 console.log('version:', version)
 function isValidPackageName(projectName) {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(projectName)
@@ -281,14 +279,6 @@ async function init() {
   console.log(`\nScaffolding project in ${root}...`)
 
   const pkg = { name: packageName, version: '0.0.0' }
-  await exec(
-    `uname -s | grep -q Darwin && brew services start postgresql@15 || service postgresql start`,
-  )
-  // boot.cjs
-  //   await exec(`sudo -u postgres psql -w postgres <<EOF
-  //   ALTER USER postgres PASSWORD '${PGPASSWORD}';
-  //   CREATE DATABASE ${packageName};
-  // EOF`)
   fs.writeFileSync(path.resolve(root, 'package.json'), JSON.stringify(pkg, null, 2))
 
   // todo:
