@@ -42,6 +42,9 @@ async function scanApiFiles(dir, basePath = '') {
       // Generate route path
       let routePath = path.join(basePath, file.replace(/\.(mjs|js)$/, ''))
 
+      // Convert [...param] format to *param format (REST parameters)
+      routePath = routePath.replace(/\[\.\.\.([^\]]+)\]/g, '*$1')
+
       // Convert [param] format to :param format
       routePath = routePath.replace(/\[([^\]]+)\]/g, ':$1')
 
