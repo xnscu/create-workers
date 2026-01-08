@@ -2,8 +2,9 @@ name: Publish Package
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+    paths: 'package.json'
 
 permissions:
   id-token: write # Required for OIDC

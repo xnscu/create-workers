@@ -1,6 +1,6 @@
 {
   "name": "create-workers",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "Start an opinioned cloudflare workers + pages project with vue 3 + vite.",
   "type": "module",
   "bin": {
