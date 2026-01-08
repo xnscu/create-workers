@@ -13,25 +13,46 @@ import sortDependencies from './sortDependencies'
  *   - Fields in `package.json` should be recursively merged
  * @param {string} src source filename to copy
  * @param {string} dest destination filename of the copy operation
+ * @param {Array} callbacks array of callbacks to execute later
+ * @param {boolean} isBackendOnly whether to exclude frontend files
+ * @param {Array} excludes array of file/folder names to exclude
  */
-function renderTemplate(src, dest, callbacks) {
+function renderTemplate(
+  src: string,
+  dest: string,
+  callbacks: Array<(dataStore: Record<string, any>) => Promise<void>>,
+  isBackendOnly: boolean = false,
+  excludes: string[] = []
+) {
   const stats = fs.statSync(src)
 
   if (stats.isDirectory()) {
+    const basename = path.basename(src)
+
     // skip node_module
-    if (path.basename(src) === 'node_modules') {
+    if (basename === 'node_modules') {
+      return
+    }
+
+    // skip excluded directories for backend-only projects
+    if (isBackendOnly && excludes.includes(basename)) {
       return
     }
 
     // if it's a directory, render its subdirectories and files recursively
     fs.mkdirSync(dest, { recursive: true })
     for (const file of fs.readdirSync(src)) {
-      renderTemplate(path.resolve(src, file), path.resolve(dest, file), callbacks)
+      renderTemplate(path.resolve(src, file), path.resolve(dest, file), callbacks, isBackendOnly, excludes)
     }
     return
   }
 
   const filename = path.basename(src)
+
+  // skip excluded files for backend-only projects
+  if (isBackendOnly && excludes.includes(filename)) {
+    return
+  }
 
   if (filename === 'package.json' && fs.existsSync(dest)) {
     // merge instead of overwriting

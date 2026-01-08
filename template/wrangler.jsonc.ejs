@@ -14,12 +14,12 @@
   "vars": {
     "GITHUB_REPO": ""
   },
-  "upload_source_maps": true,
+  "upload_source_maps": true,<% if (!BACKEND_ONLY) { %>
   "assets": {
     "directory": "./public/",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
-  },
+  },<% } %>
   "observability": {
     "enabled": true
   }

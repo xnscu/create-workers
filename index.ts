@@ -168,15 +168,29 @@ async function init() {
   // --eslint
   // --eslint-with-prettier (only support prettier through eslint for simplicity)
   // --force (for force overwriting)
+  // --backend (for backend-only workers project)
   const argv = minimist(process.argv.slice(2), {
     alias: {
       typescript: ['ts'],
       'with-tests': ['tests'],
       router: ['vue-router'],
     },
-    string: ['_'],
-    // all arguments are treated as booleans
-    boolean: true,
+    string: ['_', 'user'],
+    boolean: [
+      'backend',
+      'force',
+      'typescript',
+      'ts',
+      'jsx',
+      'router',
+      'vue-router',
+      'pinia',
+      'eslint',
+      'with-tests',
+      'tests',
+      'prod',
+      'https',
+    ],
   })
   const normalizedArgv = normalizeArgv(argv)
 
@@ -190,6 +204,7 @@ async function init() {
     shouldOverwrite?: boolean
     packageName?: string
     isProduction?: boolean
+    isBackendOnly?: boolean
   } = {}
 
   try {
@@ -208,10 +223,23 @@ async function init() {
         },
         {
           name: 'userName',
-          type: argv.user ? null : 'text',
+          type: argv.user && typeof argv.user === 'string' ? null : 'text',
           message: 'github username:',
           initial: getGhConfig()?.user ?? 'xnscu',
           validate: (dir) => isValidPackageName(dir) || 'Invalid github username',
+        },
+        {
+          name: 'isBackendOnly',
+          type: () => {
+            // Only ask if --backend was not explicitly passed
+            // Check if 'backend' was in the original command line args
+            const hasBackendArg = process.argv.includes('--backend')
+            return hasBackendArg ? null : 'toggle'
+          },
+          message: 'Create backend-only workers project (no Vue frontend)?',
+          initial: false,
+          active: 'Yes',
+          inactive: 'No',
         },
         {
           name: 'shouldOverwrite',
@@ -263,7 +291,13 @@ async function init() {
     userName = argv.user,
     shouldOverwrite = argv.force,
     isProduction = argv.prod,
+    isBackendOnly: promptBackendOnly,
   } = result
+
+  // Use command line argument if provided, otherwise use prompt result
+  const isBackendOnly = process.argv.includes('--backend')
+    ? argv.backend
+    : promptBackendOnly || false
 
   const PGPASSWORD = isProduction ? random(16) : 'postgres'
   const root = path.join(cwd, targetDir)
@@ -277,6 +311,11 @@ async function init() {
   }
 
   console.log(`\nScaffolding project in ${root}...`)
+  console.log(
+    isBackendOnly
+      ? 'Creating backend-only workers project...'
+      : 'Creating full-stack workers project...',
+  )
 
   const pkg = { name: packageName, version: '0.0.0' }
   fs.writeFileSync(path.resolve(root, 'package.json'), JSON.stringify(pkg, null, 2))
@@ -286,10 +325,30 @@ async function init() {
   // when bundling for node and the format is cjs
   // const templateRoot = new URL('./template', import.meta.url).pathname
   const templateRoot = path.resolve(__dirname, 'template')
-  const callbacks = []
+  const callbacks: Array<(dataStore: Record<string, any>) => Promise<void>> = []
+
+  // Define files/folders to exclude for backend-only projects
+  const backendOnlyExcludes = [
+    'src',
+    'public',
+    'components',
+    'composables',
+    'docs',
+    'globals',
+    'index.html.ejs',
+    'tsconfig.app.json',
+    'tsconfig.vitest.json',
+    'vite.config.mjs',
+    'vitest.config.ts',
+    '__test__',
+    '_cursorrules',
+    'CLAUDE.md',
+    '_nvmrc',
+  ]
+
   const render = function render(templateName) {
     const templateDir = path.resolve(templateRoot, templateName)
-    renderTemplate(templateDir, root, callbacks)
+    renderTemplate(templateDir, root, callbacks, isBackendOnly, backendOnlyExcludes)
   }
   // Render base template
   render('.')
@@ -298,7 +357,8 @@ async function init() {
   const HOST = normalizedArgv.HOST
   const packageJsonPath = path.resolve(root, 'package.json')
   const existingPkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-  const updatedPkg = sortDependencies(
+
+  let updatedPkg = sortDependencies(
     deepMerge(existingPkg, {
       name: projectName,
       repository: {
@@ -315,7 +375,47 @@ async function init() {
       },
     }),
   )
-  console.log({ argv, normalizedArgv, targetDir, projectName, userName })
+
+  // Remove frontend dependencies for backend-only projects
+  if (isBackendOnly) {
+    const frontendDeps = [
+      'vue',
+      'vue-router',
+      'primevue',
+      'primeicons',
+      '@primeuix/themes',
+      '@vueuse/core',
+      '@vueuse/integrations',
+      'universal-cookie',
+    ]
+
+    const frontendDevDeps = [
+      '@vitejs/plugin-vue',
+      '@vitejs/plugin-vue-jsx',
+      '@vue/eslint-config-prettier',
+      '@vue/eslint-config-typescript',
+      '@vue/test-utils',
+      '@vue/tsconfig',
+      'eslint-plugin-vue',
+      'unplugin-auto-import',
+      'unplugin-vue-components',
+      'unplugin-vue-router',
+      'vite-plugin-vue-devtools',
+      'vue-tsc',
+      '@primevue/auto-import-resolver',
+    ]
+
+    // Remove frontend dependencies
+    if (updatedPkg.dependencies) {
+      frontendDeps.forEach((dep) => delete updatedPkg.dependencies[dep])
+    }
+
+    if (updatedPkg.devDependencies) {
+      frontendDevDeps.forEach((dep) => delete updatedPkg.devDependencies[dep])
+    }
+  }
+
+  console.log({ argv, normalizedArgv, targetDir, projectName, userName, isBackendOnly })
   fs.writeFileSync(packageJsonPath, JSON.stringify(updatedPkg, null, 2) + '\n', 'utf-8')
 
   // An external data store for callbacks to share data
@@ -343,6 +443,7 @@ async function init() {
           TARGET_DIR: targetDir,
           PGDATABASE: projectName,
           VITE_NAME: projectName,
+          BACKEND_ONLY: isBackendOnly,
         }
         const content = ejs.render(template, context)
 
